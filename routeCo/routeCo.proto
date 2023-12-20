@@ -16,13 +16,13 @@ syntax = "proto3";
 
 option go_package = "github.com/craigp10/routeco/routeco";
 // option java_multiple_files = true;
-// option java_package = "io.grpc.examples.routeguide";
-// option java_outer_classname = "RouteGuideProto";
+// option java_package = "io.grpc.examples.RouteCo";
+// option java_outer_classname = "RouteCoProto";
 
 package routeco;
 
 // Interface exported by the server.
-service RouteGuide {
+service RouteCo {
   // A simple RPC.
   //
   // Obtains the feature at a given position.

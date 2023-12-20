@@ -19,7 +19,7 @@
 // Package main implements a simple gRPC server that demonstrates how to use gRPC-Go libraries
 // to perform unary, client streaming, server streaming and full duplex RPCs.
 //
-// It implements the route guide service whose definition can be found in routeguide/route_guide.proto.
+// It implements the route guide service whose definition can be found in RouteCo/route_guide.proto.
 package main
 
 import (
@@ -50,8 +50,8 @@ var (
 	port       = flag.Int("port", 50051, "The server port")
 )
 
-type routeGuideServer struct {
-	pb.UnimplementedRouteGuideServer
+type RouteCoServer struct {
+	pb.UnimplementedRouteCoServer
 	savedFeatures []*pb.Feature // read-only after initialized
 
 	mu         sync.Mutex // protects routeNotes
@@ -59,7 +59,7 @@ type routeGuideServer struct {
 }
 
 // GetFeature returns the feature at the given point.
-func (s *routeGuideServer) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feature, error) {
+func (s *RouteCoServer) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feature, error) {
 	for _, feature := range s.savedFeatures {
 		if proto.Equal(feature.Location, point) {
 			return feature, nil
@@ -70,7 +70,7 @@ func (s *routeGuideServer) GetFeature(ctx context.Context, point *pb.Point) (*pb
 }
 
 // ListFeatures lists all features contained within the given bounding Rectangle.
-func (s *routeGuideServer) ListFeatures(rect *pb.Rectangle, stream pb.RouteGuide_ListFeaturesServer) error {
+func (s *RouteCoServer) ListFeatures(rect *pb.Rectangle, stream pb.RouteCo_ListFeaturesServer) error {
 	for _, feature := range s.savedFeatures {
 		if inRange(feature.Location, rect) {
 			if err := stream.Send(feature); err != nil {
@@ -86,7 +86,7 @@ func (s *routeGuideServer) ListFeatures(rect *pb.Rectangle, stream pb.RouteGuide
 // It gets a stream of points, and responds with statistics about the "trip":
 // number of points,  number of known features visited, total distance traveled, and
 // total time spent.
-func (s *routeGuideServer) RecordRoute(stream pb.RouteGuide_RecordRouteServer) error {
+func (s *RouteCoServer) RecordRoute(stream pb.RouteCo_RecordRouteServer) error {
 	var pointCount, featureCount, distance int32
 	var lastPoint *pb.Point
 	startTime := time.Now()
@@ -119,7 +119,7 @@ func (s *routeGuideServer) RecordRoute(stream pb.RouteGuide_RecordRouteServer) e
 
 // RouteChat receives a stream of message/location pairs, and responds with a stream of all
 // previous messages at each of those locations.
-func (s *routeGuideServer) RouteChat(stream pb.RouteGuide_RouteChatServer) error {
+func (s *RouteCoServer) RouteChat(stream pb.RouteCo_RouteChatServer) error {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -148,7 +148,7 @@ func (s *routeGuideServer) RouteChat(stream pb.RouteGuide_RouteChatServer) error
 }
 
 // loadFeatures loads features from a JSON file.
-func (s *routeGuideServer) loadFeatures(filePath string) {
+func (s *RouteCoServer) loadFeatures(filePath string) {
 	var data []byte
 	if filePath != "" {
 		var err error
@@ -208,8 +208,8 @@ func serialize(point *pb.Point) string {
 	return fmt.Sprintf("%d %d", point.Latitude, point.Longitude)
 }
 
-func newServer() *routeGuideServer {
-	s := &routeGuideServer{routeNotes: make(map[string][]*pb.RouteNote)}
+func newServer() *RouteCoServer {
+	s := &RouteCoServer{routeNotes: make(map[string][]*pb.RouteNote)}
 	s.loadFeatures(*jsonDBFile)
 	return s
 }
@@ -235,7 +235,7 @@ func main() {
 		opts = []grpc.ServerOption{grpc.Creds(creds)}
 	}
 	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterRouteGuideServer(grpcServer, newServer())
+	pb.RegisterRouteCoServer(grpcServer, newServer())
 	grpcServer.Serve(lis)
 }
 

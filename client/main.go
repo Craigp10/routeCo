@@ -19,7 +19,7 @@
 // Package main implements a simple gRPC client that demonstrates how to use gRPC-Go libraries
 // to perform unary, client streaming, server streaming and full duplex RPCs.
 //
-// It interacts with the route guide service whose definition can be found in routeguide/route_guide.proto.
+// It interacts with the route guide service whose definition can be found in RouteCo/route_guide.proto.
 package main
 
 import (
@@ -46,7 +46,7 @@ var (
 )
 
 // printFeature gets the feature for the given point.
-func printFeature(client pb.RouteGuideClient, point *pb.Point) {
+func printFeature(client pb.RouteCoClient, point *pb.Point) {
 	log.Printf("Getting feature for point (%d, %d)", point.Latitude, point.Longitude)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -58,7 +58,7 @@ func printFeature(client pb.RouteGuideClient, point *pb.Point) {
 }
 
 // printFeatures lists all the features within the given bounding Rectangle.
-func printFeatures(client pb.RouteGuideClient, rect *pb.Rectangle) {
+func printFeatures(client pb.RouteCoClient, rect *pb.Rectangle) {
 	log.Printf("Looking for features within %v", rect)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -80,7 +80,7 @@ func printFeatures(client pb.RouteGuideClient, rect *pb.Rectangle) {
 }
 
 // runRecordRoute sends a sequence of points to server and expects to get a RouteSummary from server.
-func runRecordRoute(client pb.RouteGuideClient) {
+func runRecordRoute(client pb.RouteCoClient) {
 	// Create a random number of random points
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	pointCount := int(r.Int31n(100)) + 2 // Traverse at least two points
@@ -108,7 +108,7 @@ func runRecordRoute(client pb.RouteGuideClient) {
 }
 
 // runRouteChat receives a sequence of route notes, while sending notes for various locations.
-func runRouteChat(client pb.RouteGuideClient) {
+func runRouteChat(client pb.RouteCoClient) {
 	notes := []*pb.RouteNote{
 		{Location: &pb.Point{Latitude: 0, Longitude: 1}, Message: "First message"},
 		{Location: &pb.Point{Latitude: 0, Longitude: 2}, Message: "Second message"},
@@ -174,7 +174,7 @@ func main() {
 		log.Fatalf("fail to dial: %v", err)
 	}
 	defer conn.Close()
-	client := pb.NewRouteGuideClient(conn)
+	client := pb.NewRouteCoClient(conn)
 
 	// Looking for a valid feature
 	printFeature(client, &pb.Point{Latitude: 409146138, Longitude: -746188906})
