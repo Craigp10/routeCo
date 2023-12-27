@@ -48,7 +48,9 @@ var (
 // printFeature gets the feature for the given point.
 func printFeature(client pb.RouteCoClient, point *pb.Point) {
 	log.Printf("Getting feature for point (%d, %d)", point.Latitude, point.Longitude)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Set timeout for client gRPC connection. If lowered may timeout due to 1 second sleep added to server
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+
 	defer cancel()
 	feature, err := client.GetFeature(ctx, point)
 	if err != nil {

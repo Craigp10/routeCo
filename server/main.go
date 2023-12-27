@@ -77,6 +77,7 @@ func (s *RouteCoServer) ListFeatures(rect *pb.Rectangle, stream pb.RouteCo_ListF
 				return err
 			}
 		}
+		time.Sleep((1 / 5) * time.Second)
 	}
 	return nil
 }
